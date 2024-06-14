@@ -16,12 +16,32 @@ def formata_numero(valor, prefixo = ''):
 #----------------------------------------------------------------
 
 url = 'https://labdados.com/produtos'
-response = requests.get(url)
+#Criando um filtro direto na url da API com escolha do usuário
+regioes = ['Brasil', 'Centro-Oeste','Nordeste', 'Sudeste', 'Sul']
+st.sidebar.title('Filtros')
+regiao = st.sidebar.selectbox('Região', regioes) #Variavel para armazenar a escolha do usuário
+
+if regiao == 'Brasil':
+    regiao = ''
+
+todos_anos = st.sidebar.checkbox('Dados de todo o período', value = True)
+if todos_anos:
+    ano = ''
+else:
+    ano = st.sidebar.slider('Ano',2020,2023)
+
+query_string = {'regiao':regiao.lower(), 'ano':ano}
+response = requests.get(url,params = query_string)
 
 # Transformando a requisição em json e depois convertendo para df
 dados = pd.DataFrame.from_dict(response.json())
 
 dados['Data da Compra'] = pd.to_datetime(dados['Data da Compra'], format = '%d/%m/%Y')
+
+#Filtro dos vendedores
+filtro_vendedores = st.sidebar.multiselect('Vendedores', dados['Vendedor'].unique())
+if filtro_vendedores:
+    dados = dados[dados['Vendedor'].isin(filtro_vendedores)]
 
 #----------------------------------------------------------------
 # Tabelas
@@ -48,7 +68,7 @@ maiores_vendas_estados = vendas_estado.sort_values('Produto', ascending=False)
 vendas_produto = dados.groupby('Produto')[['Preço']].count()
 vendas_produto['Quantidade'] = vendas_produto['Preço']
 
-#Tabelas Vendedores
+##Tabelas Vendedores
 vendedores = pd.DataFrame(dados.groupby('Vendedor')['Preço'].agg(['sum','count']))
 
 #----------------------------------------------------------------
@@ -126,11 +146,12 @@ st.title('DASHBOARD DE VENDAS')
 
 aba0, aba1, aba2, aba3 = st.tabs(['Dados','Receita', 'Quantidade de vendas', 'Vendedores'])
 
-with aba0:
-    st.dataframe(dados)
+with aba0: # Dados
+    linhas = st.number_input('Número de Linhas',1,None,10)
+    st.dataframe(dados.head(linhas))
     st.dataframe(vendas_produto)
 
-with aba1:
+with aba1: # Receita
     col1, col2 = st.columns(2)
     with col1:
         st.metric('Receita', formata_numero(dados['Preço'].sum(),'R$'))
@@ -142,7 +163,7 @@ with aba1:
         st.plotly_chart(fig_receita_mensal, use_container_width= True)
         st.plotly_chart(fig_receita_categorias, use_container_width= True)
 
-with aba2:
+with aba2: # Quantidade de Vendas
     col1, col2 = st.columns(2)
     with col1:
         st.metric('Receita', formata_numero(dados['Preço'].sum(),'R$'))
@@ -154,7 +175,7 @@ with aba2:
         st.plotly_chart(fig_vendas_mensal, use_container_width= True)
         st.plotly_chart(fig_produtos, use_container_width=True)
 
-with aba3:
+with aba3: #Vendedores
     qtd_vendedores = st.number_input('Quantidade de Vendedores', 2,10,5)
     col1, col2 = st.columns(2)
     with col1:
