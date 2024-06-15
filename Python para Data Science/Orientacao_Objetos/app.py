@@ -1,17 +1,16 @@
-class Restaurante:
-    restaurantes = []
-    def __init__(self, nome, categoria):
-        self.nome = nome
-        self.categoria = categoria
-        self.ativo = False
-        Restaurante.restaurantes.append(self) #Pega o objeto(self) e coloca na lista criada
-    def __str__(self):
-        return f'Objeto: {self.nome}'
-    def listar_restaurantes():
-        for restaurante in Restaurante.restaurantes:
-            print(f'{restaurante.nome} | {restaurante.categoria}|{restaurante.ativo}')
+from modelos.classes import Restaurante
 
-restaurante_praca = Restaurante('Praça','Gourmet')
-restaurante_pizza = Restaurante('Pizza Express','Italiana')
+restaurante_praca = Restaurante('praça', 'Gourmet')
+restaurante_mexicano = Restaurante('MexicanFood', 'Mexicana')
 
-Restaurante.listar_restaurantes()
+restaurante_mexicano.receber_avaliacao('Gui',4)
+restaurante_mexicano.receber_avaliacao('Milena', 10)
+restaurante_mexicano.receber_avaliacao('Carlos', 5)
+
+restaurante_mexicano.alternar_estado()
+
+def main():
+    Restaurante.listar_restaurantes()
+
+if __name__ == '__main__':
+    main()
