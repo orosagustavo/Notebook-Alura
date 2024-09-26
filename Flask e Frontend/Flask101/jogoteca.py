@@ -37,5 +37,4 @@ def adicionar():
     jogos.append(novo_jogo)
     return render_template('listaDinamica.html', titulo = 'Jogos', jogos = jogos)
 
-
 app.run(debug = True)
