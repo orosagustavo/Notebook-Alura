@@ -1,0 +1,4 @@
+A pesquisa de hiperparâmetros foi concluída. O número ideal de dimensões de incorporação é 128,
+o número ideal de unidades LSTM é 128, e
+o número ideal de unidades densas é 32,
+e a taxa de abandono ideal é 0.30000000000000004.
